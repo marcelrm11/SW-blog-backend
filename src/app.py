@@ -31,12 +31,25 @@ setup_admin(app)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
-    return jsonify(response_body), 200
+# Users
+# --------------------------------------------------
+
+@app.route('/users', methods=['GET'])
+def get_uses():
+    users = []
+    for user in User.query.all():
+        users.append(user.serialize())
+    return jsonify(users)
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.query.get(user_id)
+    return jsonify(user.serialize())
+
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
+    user = User.query.get(user_id)
+    return jsonify([f.serialize() for f in user.favorites])
 
 # Characters
 # ------------------------------------------------------------
@@ -88,9 +101,10 @@ def get_character(character_id):
     return jsonify(character.serialize())
 
 @app.route('/characters/<int:character_id>/vehicles', methods=['GET'])
+# using a list comprehension to iterate through the vehicles list, extract the vehicle attribute from each Character_X_Vehicle object, and serialize it. You can then pass this list to the jsonify function to return it in the response.
 def get_character_vehicles(character_id):
     character = Character.query.get(character_id)
-    vehicles = character.vehicles
+    vehicles = [v.vehicle.serialize() for v in character.vehicles]
     return jsonify(vehicles)
 
 # Planets
@@ -138,7 +152,6 @@ def get_planets():
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
         planet = Planet.query.filter_by(id=planet_id).first()
-        # print(Character.query.all())
         print(planet)
         return jsonify(planet.serialize())
 
@@ -181,11 +194,23 @@ def crete_vehicle():
 
 @app.route('/vehicles', methods=['GET'])
 def get_vehicles():
-    return {}
+    vehicles = []
+    for vehicle in Vehicle.query.all():
+        vehicles.append(vehicle.serialize())
+    return jsonify(vehicles)
 
 @app.route('/vehicles/<int:vehicle_id>', methods=['GET'])
 def get_vehicle(vehicle_id):
-    return {}
+    vehicle = Vehicle.query.filter_by(id=vehicle_id).first()
+    print(vehicle)
+    return jsonify(vehicle.serialize())
+
+@app.route('/vehicles/<int:vehicle_id>/characters', methods=['GET'])
+def get_vehicle_characters(vehicle_id):
+    vehicle = Vehicle.query.get(vehicle_id)
+    characters = [c.character.serialize() for c in vehicle.characters]
+    return jsonify(characters)
+
 
 # Sitemap
 # -------------------------------------------------------
