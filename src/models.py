@@ -24,6 +24,25 @@ class Planet(db.Model):
     surface_water_percent = db.Column(db.Float)
     characters = db.relationship('Character', backref='planet', lazy=True)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "url": self.url,
+            "diameter_in_km": self.diameter_in_km,
+            "rotation_period_in_days": self.rotation_period_in_days,
+            "orbital_period_in_days": self.orbital_period_in_days,
+            "gravity_in_g": self.gravity_in_g,
+            "population": self.population,
+            "climate": self.climate,
+            "terrain": self.terrain,
+            "surface_water_percent": self.surface_water_percent
+        }
+
+    def __repr__(self):
+        return f'<Planet ID: {self.id}, name: {self.name}>'
+
+
 class Vehicle(db.Model):
     __tablename__ = 'vehicle'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +57,28 @@ class Vehicle(db.Model):
     passengers = db.Column(db.Integer)
     max_atmosphering_speed_in_kmh = db.Column(db.Float)
     cargo_capacity_in_kg = db.Column(db.Float)
+    characters = db.relationship('Character_X_Vehicle', backref='vehicle')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "url": self.url,
+            "model": self.model,
+            "vehicle_class": self.vehicle_class,
+            "manufacturer": self.manufacturer,
+            "cost_in_credits": self.cost_in_credits,
+            "length_in_m": self.length_in_m,
+            "crew": self.crew,
+            "passengers": self.passengers,
+            "max_atmosphering_speed_in_kmh": self.max_atmosphering_speed_in_kmh,
+            "cargo_capacity_in_kg": self.cargo_capacity_in_kg,
+            "characters": [character.serialize() for character in self.characters]
+        }
+
+    def __repr__(self):
+        return f'<Character ID: {self.id}, name: {self.name}>'
+
 
 class Character(db.Model):
     __tablename__ = 'character'
@@ -52,14 +93,44 @@ class Character(db.Model):
     birthyear = db.Column(db.String(30))
     gender = db.Column(db.String(30))
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
+    vehicles = db.relationship('Character_X_Vehicle', backref='character')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "url": self.url,
+            "height_in_cm": self.height_in_cm,
+            "mass_in_kg": self.mass_in_kg,
+            "hair_color": self.hair_color,
+            "skin_color": self.skin_color,
+            "eye_color": self.eye_color,
+            "birthyear": self.birthyear,
+            "gender": self.gender,
+            "planet_id": self.planet_id,
+            "vehicles": [vehicle.serialize() for vehicle in self.vehicles]
+        }
+
+    def __repr__(self):
+        return f'<Character ID: {self.id}, name: {self.name}>'
 
 class Character_X_Vehicle(db.Model):
     __tablename__ = 'character_x_vehicle'
     id = db.Column(db.Integer, primary_key=True)
     character_id = db.Column(db.Integer, db.ForeignKey('character.id'))
-    characters = db.relationship('Character', backref='character_x_vehicle')
+    character = db.relationship('Character', backref='characters_vehicles')
     vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'))
-    vehicles = db.relationship('Vehicle', backref='character_x_vehicle')
+    vehicle = db.relationship('Vehicle', backref='characters_vehicles')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "character_id": self.character_id,
+            "character": self.character.serialize(),
+            "vehicle_id": self.vehicle_id,
+            "vehicle": self.vehicle.serialize()
+        }
+    
 
 class Favorite(db.Model):
     __tablename__ = 'favorite'
