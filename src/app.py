@@ -36,20 +36,22 @@ def handle_invalid_usage(error):
 
 @app.route('/users', methods=['GET'])
 def get_uses():
-    users = []
-    for user in User.query.all():
-        users.append(user.serialize())
-    return jsonify(users)
+    try:
+        users = []
+        for user in User.query.all():
+            users.append(user.serialize())
+        return jsonify(users)
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    user = User.query.get(user_id)
-    return jsonify(user.serialize())
+    try:
+        user = User.query.get(user_id)
+        return jsonify(user.serialize())
+    except:
+        return {'error': 'Something went wrong...'}
 
-@app.route('/users/<int:user_id>/favorites', methods=['GET'])
-def get_user_favorites(user_id):
-    user = User.query.get(user_id)
-    return jsonify([f.serialize() for f in user.favorites])
 
 # Characters
 # ------------------------------------------------------------
@@ -88,24 +90,31 @@ def create_character():
 
 @app.route('/characters', methods=['GET'])
 def get_characters():
-    characters = []
-    for character in Character.query.all():
-        characters.append(character.serialize())
-    return jsonify(characters)
+    try:
+        characters = []
+        for character in Character.query.all():
+            characters.append(character.serialize())
+        return jsonify(characters)
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/characters/<int:character_id>', methods=['GET'])
 def get_character(character_id):
-    character = Character.query.filter_by(id=character_id).first()
-    # print(Character.query.all())
-    print(character)
-    return jsonify(character.serialize())
+    try:
+        character = Character.query.filter_by(id=character_id).first()
+        return jsonify(character.serialize())
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/characters/<int:character_id>/vehicles', methods=['GET'])
 # using a list comprehension to iterate through the vehicles list, extract the vehicle attribute from each Character_X_Vehicle object, and serialize it. You can then pass this list to the jsonify function to return it in the response.
 def get_character_vehicles(character_id):
-    character = Character.query.get(character_id)
-    vehicles = [v.vehicle.serialize() for v in character.vehicles]
-    return jsonify(vehicles)
+    try:
+        character = Character.query.get(character_id)
+        vehicles = [v.vehicle.serialize() for v in character.vehicles]
+        return jsonify(vehicles)
+    except:
+        return {'error': 'Something went wrong...'}
 
 # Planets
 # --------------------------------------------------------
@@ -144,72 +153,134 @@ def create_planet():
 
 @app.route('/planets', methods=['GET'])
 def get_planets():
+    try:
         planets = []
         for planet in Planet.query.all():
             planets.append(planet.serialize())
         return jsonify(planets)
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
+    try:
         planet = Planet.query.filter_by(id=planet_id).first()
-        print(planet)
         return jsonify(planet.serialize())
+    except:
+        return {'error': 'Something went wrong...'}
 
 # Vehicles
 # ------------------------------------------------------
 
 @app.route('/vehicles/create', methods=['POST'])
 def crete_vehicle():
-    speeder_bike_dict = {
-        "name": "Speeder Bike",
-        "url": "https://swapi.co/api/vehicles/1/",
-        "model": "74-Z",
-        "vehicle_class": "Speeder",
-        "manufacturer": "Aratech Repulsor Company",
-        "cost_in_credits": "8000",
-        "length_in_m": "3.2",
-        "crew": "1",
-        "passengers": "1",
-        "max_atmosphering_speed_in_kmh": "360",
-        "cargo_capacity_in_kg": "4"
-    }
-    millennium_falcon_dict = {
-        "name": "Millennium Falcon",
-        "url": "https://swapi.co/api/vehicles/10/",
-        "model": "YT-1300 light freighter",
-        "vehicle_class": "light freighter",
-        "manufacturer": "Corellian Engineering Corporation",
-        "cost_in_credits": "100000",
-        "length_in_m": "34.37",
-        "crew": "4",
-        "passengers": "6",
-        "max_atmosphering_speed_in_kmh": "1050",
-        "cargo_capacity_in_kg": "100000"
-    }
-    vehicles_list = [speeder_bike_dict, millennium_falcon_dict]
-    vehicles = [Vehicle(**vehicle) for vehicle in vehicles_list]
-    db.session.add_all(vehicles)
-    db.session.commit()
+    # speeder_bike_dict = {
+    #     "name": "Speeder Bike",
+    #     "url": "https://swapi.co/api/vehicles/1/",
+    #     "model": "74-Z",
+    #     "vehicle_class": "Speeder",
+    #     "manufacturer": "Aratech Repulsor Company",
+    #     "cost_in_credits": "8000",
+    #     "length_in_m": "3.2",
+    #     "crew": "1",
+    #     "passengers": "1",
+    #     "max_atmosphering_speed_in_kmh": "360",
+    #     "cargo_capacity_in_kg": "4"
+    # }
+    # millennium_falcon_dict = {
+    #     "name": "Millennium Falcon",
+    #     "url": "https://swapi.co/api/vehicles/10/",
+    #     "model": "YT-1300 light freighter",
+    #     "vehicle_class": "light freighter",
+    #     "manufacturer": "Corellian Engineering Corporation",
+    #     "cost_in_credits": "100000",
+    #     "length_in_m": "34.37",
+    #     "crew": "4",
+    #     "passengers": "6",
+    #     "max_atmosphering_speed_in_kmh": "1050",
+    #     "cargo_capacity_in_kg": "100000"
+    # }
+    # vehicles_list = [speeder_bike_dict, millennium_falcon_dict]
+    # vehicles = [Vehicle(**vehicle) for vehicle in vehicles_list]
+    # db.session.add_all(vehicles)
+    # db.session.commit()
     return {"msg": "create vehicle"}
 
 @app.route('/vehicles', methods=['GET'])
 def get_vehicles():
-    vehicles = []
-    for vehicle in Vehicle.query.all():
-        vehicles.append(vehicle.serialize())
-    return jsonify(vehicles)
+    try:
+        vehicles = []
+        for vehicle in Vehicle.query.all():
+            vehicles.append(vehicle.serialize())
+        return jsonify(vehicles)
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/vehicles/<int:vehicle_id>', methods=['GET'])
 def get_vehicle(vehicle_id):
-    vehicle = Vehicle.query.filter_by(id=vehicle_id).first()
-    print(vehicle)
-    return jsonify(vehicle.serialize())
+    try:
+        vehicle = Vehicle.query.filter_by(id=vehicle_id).first()
+        return jsonify(vehicle.serialize())
+    except:
+        return {'error': 'Something went wrong...'}
 
 @app.route('/vehicles/<int:vehicle_id>/characters', methods=['GET'])
 def get_vehicle_characters(vehicle_id):
-    vehicle = Vehicle.query.get(vehicle_id)
-    characters = [c.character.serialize() for c in vehicle.characters]
-    return jsonify(characters)
+    try:
+        vehicle = Vehicle.query.get(vehicle_id)
+        characters = [c.character.serialize() for c in vehicle.characters]
+        return jsonify(characters)
+    except:
+        return {'error': 'Something went wrong...'}
+
+# Favorites
+# ---------------------------------------------------------
+
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_user_favorites(user_id):
+    try:
+        user = User.query.get(user_id)
+        return jsonify([f.serialize() for f in user.favorites])
+    except:
+        return {'error': 'Something went wrong...'}
+
+@app.route('/users/<int:user_id>/favorites/<group>/<int:obj_id>/add', methods=['POST'])
+def add_favorite(user_id, group, obj_id):
+    try:
+        new_fav = Favorite(user_id=user_id)
+        if group == 'characters':
+            element = Character.query.get(obj_id)
+            new_fav.character_id = obj_id
+        elif group == 'planets':
+            element = Planet.query.get(obj_id)
+            new_fav.planet_id = obj_id
+        elif group == 'vehicles':
+            element = Vehicle.query.get(obj_id)
+            new_fav.vehicle_id = obj_id
+        db.session.add(new_fav)
+        db.session.commit()
+        return {'msg': f'favorite {group} added'}
+    except:
+        db.session.rollback()
+        return {'error': 'Something went wrong...'}
+    finally:
+        db.session.close()
+
+@app.route('/users/<int:user_id>/favorites/<int:fav_id>/delete', methods=['DELETE'])
+def delete_favorite_planet(user_id, fav_id):
+    try:
+        fav_to_delete = Favorite.query.get(fav_id)
+        if fav_to_delete.user_id == user_id:
+            db.session.delete(fav_to_delete)
+            db.session.commit()
+            return {'msg': 'favorite was deleted'}
+        else:
+            return {'error': 'wrong user'}
+    except:
+        db.session.rollback()
+        return {'error': 'Something went wrong...'}
+    finally:
+        db.session.close()
 
 
 # Sitemap

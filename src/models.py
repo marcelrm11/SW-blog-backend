@@ -30,6 +30,7 @@ class Planet(db.Model):
     terrain = db.Column(db.String(240)) 
     surface_water_percent = db.Column(db.Float)
     characters = db.relationship('Character', backref='planet', lazy=True)
+    favorite = db.relationship('Favorite', backref='planet')
 
     def serialize(self):
         return {
@@ -65,6 +66,7 @@ class Vehicle(db.Model):
     max_atmosphering_speed_in_kmh = db.Column(db.Float)
     cargo_capacity_in_kg = db.Column(db.Float)
     characters = db.relationship('Character_X_Vehicle')
+    favorite = db.relationship('Favorite', backref='vehicle')
 
     def serialize(self):
         return {
@@ -84,7 +86,7 @@ class Vehicle(db.Model):
         }
 
     def __repr__(self):
-        return f'<Character ID: {self.id}, name: {self.name}>'
+        return f'<Vehicle ID: {self.id}, name: {self.name}>'
 
 
 class Character(db.Model):
@@ -101,6 +103,7 @@ class Character(db.Model):
     gender = db.Column(db.String(30))
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
     vehicles = db.relationship('Character_X_Vehicle')
+    favorite = db.relationship('Favorite', backref='character')
 
     def serialize(self):
         return {
@@ -144,13 +147,10 @@ class Character_X_Vehicle(db.Model):
 class Favorite(db.Model):
     __tablename__ = 'favorite'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     character_id = db.Column(db.Integer, db.ForeignKey('character.id'))
-    character = db.relationship('Character', backref='favorite')
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
-    planet = db.relationship('Planet', backref='favorite')
     vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'))
-    vehicle = db.relationship('Vehicle', backref='favorite')
 
     def serialize(self):
         favorite = None
